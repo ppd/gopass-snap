@@ -13,4 +13,10 @@ fi
 
 ln -snf "$REALHOME/.gnupg" "$HOME/.gnupg"
 
+if grep -q sss_ssh_knownhostsproxy /etc/ssh/ssh_config; then
+  # ignore global SSH config because SSSD's known hosts config is not supported
+  # by the ssh-keys interface
+  export GIT_SSH_COMMAND="ssh -F $REALHOME/.ssh/config"
+fi
+
 exec "${@}"

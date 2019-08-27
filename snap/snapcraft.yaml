@@ -23,6 +23,7 @@ apps:
       - x11 # for xsel
       - gpg-keys # useless for this app so far, thus devmode
       - gpg-public-keys
+      - ssh-keys # for git
 
 parts:
   launchers:
