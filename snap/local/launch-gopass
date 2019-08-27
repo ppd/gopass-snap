@@ -5,6 +5,8 @@ PASSWORD_STORE="$SNAP_USER_COMMON/password-store"
 CONFIG_DIR="$SNAP_USER_DATA/.config/gopass"
 CONFIG_FILE="$CONFIG_DIR/config.yml"
 
+# the home interface does not grant us access to dot-prefixed directories
+# in REALHOME
 mkdir -p "$PASSWORD_STORE"
 if [ ! -f "$CONFIG_FILE" ]; then
   mkdir -p "$CONFIG_DIR"
