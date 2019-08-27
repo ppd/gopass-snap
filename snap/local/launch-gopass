@@ -1,5 +1,10 @@
 #!/bin/bash
 
-ln -snf "/home/mfederle/.gnupg" "$HOME/.gnupg"
+REALHOME=`getent passwd $UID | cut -d ':' -f 6`
+
+ln -snf "$REALHOME/.gnupg" "$HOME/.gnupg"
+
+mkdir -p "$SNAP_USER_COMMON/password-store"
+ln -snf "$SNAP_USER_COMMON/password-store" "$HOME/.password-store"
 
 exec "${@}"

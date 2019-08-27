@@ -11,26 +11,16 @@ description: |
   providing a stellar user experience and a sane, simple interface.
 
 grade: stable
-confinement: strict
+confinement: devmode
 
 apps:
-  gpg:
-    command: bin/launch-gopass $SNAP/usr/bin/gpg
-    plugs:
-      - gpg-keys
-      - gpg-public-keys
-      - home
-      - network
   gopass:
     command: bin/launch-gopass $SNAP/bin/gopass
     plugs:
       - home
       - network
-      - gpg-keys
+      - gpg-keys # useless for this app so far, thus devmode
       - gpg-public-keys
-    environment:
-      PASSWORD_STORE: $SNAP_USER_COMMON/password-store
-      GNUPGHOME: /home/mfederle/.gnupg
 
 parts:
   launchers:
