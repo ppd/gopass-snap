@@ -1,0 +1,51 @@
+name: gopass
+base: core18
+version: "1.8.6"
+summary: The slightly more awesome Standard Unix Password Manager for Teams
+description: | 
+  gopass is a rewrite of the pass password manager in Go with the aim of making it 
+  cross-platform and adding additional features. Our target audience are professional 
+  developers and sysadmins (and especially teams of those) who are well versed with a 
+  command line interface. One explicit goal for this project is to make it more approachable 
+  to non-technical users. We go by the UNIX philosophy and try to do one thing and do it well, 
+  providing a stellar user experience and a sane, simple interface.
+
+grade: stable
+confinement: strict
+
+apps:
+  gpg:
+    command: bin/launch-gopass $SNAP/usr/bin/gpg
+    plugs:
+      - gpg-keys
+      - gpg-public-keys
+      - home
+      - network
+  gopass:
+    command: bin/launch-gopass $SNAP/bin/gopass
+    plugs:
+      - home
+      - network
+      - gpg-keys
+      - gpg-public-keys
+    environment:
+      PASSWORD_STORE: $SNAP_USER_COMMON/password-store
+      GNUPGHOME: /home/mfederle/.gnupg
+
+parts:
+  launchers:
+    plugin: dump
+    source: snap/local
+    organize:
+      'launch-gopass': bin/launch-gopass
+  gopass:
+    plugin: go
+    go-importpath: github.com/gopasspw/gopass
+    source: https://github.com/gopasspw/gopass.git
+    source-tag: "v1.8.6"
+    build-packages:
+      - gcc
+    stage-packages:
+      - git
+      - gnupg
+      - rng-tools

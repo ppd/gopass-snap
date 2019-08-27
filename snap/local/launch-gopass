@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ln -snf "/home/mfederle/.gnupg" "$HOME/.gnupg"
+
+exec "${@}"
