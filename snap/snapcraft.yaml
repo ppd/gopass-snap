@@ -19,6 +19,7 @@ apps:
     plugs:
       - home
       - network
+      - x11 # for xsel
       - gpg-keys # useless for this app so far, thus devmode
       - gpg-public-keys
 
@@ -39,3 +40,4 @@ parts:
       - git
       - gnupg
       - rng-tools
+      - xsel
