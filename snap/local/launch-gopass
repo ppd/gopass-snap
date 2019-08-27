@@ -1,10 +1,16 @@
 #!/bin/bash
 
 REALHOME=`getent passwd $UID | cut -d ':' -f 6`
+PASSWORD_STORE="$SNAP_USER_COMMON/password-store"
+CONFIG_DIR="$SNAP_USER_DATA/.config/gopass"
+CONFIG_FILE="$CONFIG_DIR/config.yml"
+
+mkdir -p "$PASSWORD_STORE"
+if [ ! -f "$CONFIG_FILE" ]; then
+  mkdir -p "$CONFIG_DIR"
+  printf "%s\n" "root:" "  path: gpgcli-gitcli-fs+file://$PASSWORD_STORE" > "$CONFIG_FILE"
+fi
 
 ln -snf "$REALHOME/.gnupg" "$HOME/.gnupg"
-
-mkdir -p "$SNAP_USER_COMMON/password-store"
-ln -snf "$SNAP_USER_COMMON/password-store" "$HOME/.password-store"
 
 exec "${@}"

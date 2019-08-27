@@ -12,6 +12,7 @@ description: |
 
 grade: stable
 confinement: devmode
+license: MIT
 
 apps:
   gopass:
