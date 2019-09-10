@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+cd "$SNAP_USER_DATA/../current"
+SNAP_CURRENT="$(pwd)"
+export GNUPGHOME="$SNAP_CURRENT/.gnupg"
+
+if [ ! -d "$GNUPGHOME" ]; then
+    mkdir -m 0700 "$GNUPGHOME"
+    cat > "$GNUPGHOME/gpg-agent.conf" <<EOM
+homedir $GNUPGHOME
+EOM
+
+    cat > "$GNUPGHOME/gpg.conf" <<EOM
+homedir $GNUPGHOME
+EOM
+fi
+
+exec "${@}"

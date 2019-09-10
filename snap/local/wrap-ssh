@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+SSH_ENV=$HOME/.ssh/environment
+
+mkdir -p "$HOME/.ssh"
+
+function start_agent {
+  echo "Initialising new SSH agent..."
+  ssh-agent > "${SSH_ENV}"
+  chmod 600 "${SSH_ENV}"
+  . "${SSH_ENV}" > /dev/null
+  ssh-add
+}
+
+if [ -f "${SSH_ENV}" ]; then
+  . "${SSH_ENV}" > /dev/null
+  ps "${SSH_AGENT_PID}" > /dev/null || {
+    start_agent;
+  }
+else
+  start_agent;    
+fi
+
+exec "${@}"

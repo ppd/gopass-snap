@@ -1,0 +1,39 @@
+#!/bin/bash
+set -e
+
+if [ -z "$SNAP_USER_DATA" ]; then
+    echo "SNAP_USER_DATA not set"
+    exit 1
+fi
+
+myid="$(id -u)"
+host_home=$(getent passwd "$myid" | cut -d ':' -f 6)
+
+host_gpg="$host_home/.gnupg"
+if [ ! -d "$host_gpg" ]; then
+    echo "'$host_gpg' does not exist"
+    exit 0
+fi
+
+dest="$SNAP_USER_DATA/.gnupg"
+if [ -d "$dest" ]; then
+    rm -rf "$dest"/*
+else
+    mkdir -m 0700 "$dest"
+fi
+
+cp -r "$host_gpg"/* "$dest"
+rm -f "$dest"/S.*    # remove any sockets
+rm -f "$dest"/*.conf # remove any config files
+
+cd "$SNAP_USER_DATA/../current"
+SNAP_CURRENT="$(pwd)"
+GNUPGHOME="$SNAP_CURRENT/.gnupg"
+
+cat > "$GNUPGHOME/gpg-agent.conf" <<EOM
+homedir $GNUPGHOME
+EOM
+
+cat > "$GNUPGHOME/gpg.conf" <<EOM
+homedir $GNUPGHOME
+EOM

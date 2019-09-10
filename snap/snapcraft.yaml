@@ -15,53 +15,26 @@ grade: stable
 confinement: strict
 license: MIT
 
+plugs:
+  home: null
+  gpg-keys: null
+  gpg-public-keys: null
+  network-bind: null
+  
 apps:
-  gpg:
-    command: bin/launch-gopass $SNAP/usr/bin/gpg
-    plugs:
-      - home
-      - gpg-keys
-      - gpg-public-keys
-      - ssh-keys
+  import-gpg-keys:
+    command: import-gpg-keys
   gopass:
-    command: bin/launch-gopass $SNAP/bin/gopass
+    command: bin/gopass
+    command-chain: [wrap-ssh, wrap-gpg, launch-gopass]
     plugs:
-      - home
-      - network
       - x11 # for xsel
-      - gpg-keys # useless for this app so far, thus devmode
-      - gpg-public-keys
       - ssh-keys # for git
 
 parts:
   launchers:
     plugin: dump
     source: snap/local
-    organize:
-      'launch-gopass': bin/launch-gopass
-  gnupg:
-    plugin: autotools
-    source: https://github.com/gpg/gnupg.git
-    source-tag: gnupg-2.2.17
-    configflags:
-      - --prefix=/usr
-      - --enable-maintainer-mode
-      - --disable-doc
-    override-build: |
-      sed -i -E 's|"S.gpg-agent"|"S.gpg-agent.extra"|g' configure.ac
-      ./autogen.sh
-      snapcraftctl build
-    build-packages:
-      - libnpth0-dev
-      - libgpg-error-dev
-      - gettext
-      - libgcrypt20-dev
-      - libksba-dev
-      - libassuan-dev
-    stage-packages:
-      - libassuan0
-      - libksba8
-      - libnpth0
   gopass:
     plugin: go
     go-importpath: github.com/gopasspw/gopass
@@ -73,3 +46,37 @@ parts:
       - git
       - rng-tools
       - xsel
+      - gpg
+      - gpg-agent
+      - gpgconf
+      - gpgsm
+      - gpgv
+      - pinentry-curses
+      - bsdutils
+      - openssh-client
+
+layout:
+  /etc/gnupg:
+    bind: $SNAP/etc/gnupg
+  /usr/bin/dirmngr:
+    bind-file: $SNAP/usr/bin/dirmngr
+  /usr/bin/gpg:
+    bind-file: $SNAP/usr/bin/gpg
+  /usr/bin/gpg-agent:
+    bind-file: $SNAP/usr/bin/gpg-agent
+  /usr/bin/gpg-connect-agent:
+    bind-file: $SNAP/usr/bin/gpg-connect-agent
+  /usr/bin/gpgconf:
+    bind-file: $SNAP/usr/bin/gpgconf
+  /usr/bin/gpgsm:
+    bind-file: $SNAP/usr/bin/gpgsm
+  /usr/bin/gpgv:
+    bind-file: $SNAP/usr/bin/gpgv
+  /usr/bin/pinentry:
+    bind-file: $SNAP/usr/bin/pinentry-curses
+  /usr/lib/gnupg:
+    bind: $SNAP/usr/lib/gnupg
+  /usr/share/gnupg:
+    bind: $SNAP/usr/share/gnupg
+  /usr/bin/ssh-agent:
+    bind-file: $SNAP/usr/bin/ssh-agent
