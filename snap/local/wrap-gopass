@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 faketty() {
     script -qfc "$(printf "%q " "$@")" /dev/null
@@ -18,16 +19,20 @@ if ! gpg_keys_connected; then
   echo "Plug gpg-keys is not connected. This is required for the default gpg crypto backend."
   echo "To connect, run:"
   echo "snap connect gopass:gpg-keys"
+fi
+
+if ! ssh_keys_connected || ! gpg_keys_connected; then
   exit 1
 fi
 
 # the home interface does not grant us access to dot-prefixed directories
 # in REALHOME
-REALHOME=`getent passwd $UID | cut -d ':' -f 6`
-password_store="$REALHOME/password-store"
+
+realhome=`getent passwd $UID | cut -d ':' -f 6`
+password_store="$realhome/password-store"
 config_dir="$SNAP_USER_DATA/.config/gopass"
 config_file="$config_dir/config.yml"
-mkdir -p "$PASSWORD_STORE"
+mkdir -p "$password_store"
 if [ ! -f "$config_file" ]; then
   mkdir -p "$config_dir"
   printf "%s\n" "root:" "  path: gpgcli-gitcli-fs+file://$password_store" > "$config_file"

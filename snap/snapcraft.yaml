@@ -25,7 +25,7 @@ plugs:
 apps:
   gopass:
     command: bin/gopass
-    command-chain: [launch-gopass, import-gpg-keys, link-ssh, wrap-gpg, start-ssh-agent]
+    command-chain: [wrap-gopass, set-up-gpg, set-up-ssh]
 
 parts:
   launchers:
