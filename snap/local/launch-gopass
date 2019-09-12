@@ -1,22 +1,49 @@
 #!/bin/bash
 
-REALHOME=`getent passwd $UID | cut -d ':' -f 6`
-PASSWORD_STORE="$REALHOME/password-store"
-CONFIG_DIR="$SNAP_USER_DATA/.config/gopass"
-CONFIG_FILE="$CONFIG_DIR/config.yml"
+faketty() {
+    script -qfc "$(printf "%q " "$@")" /dev/null
+}
+
+# check the required interfaces (ssh-keys, gpg-keys) and tell user how to connect them
+stat /etc/ssh/ssh_config && ssh_keys_connected=true
+stat /usr/bin/gpg && gpg_keys_connected=true
+
+if ! ssh_keys_connected; then
+  echo "Plug ssh-keys is not connected. This is required for syncing with git ssh remotes."
+  echo "To connect, run:"
+  echo "snap connect gopass:ssh-keys"
+fi
+
+if ! gpg_keys_connected; then
+  echo "Plug gpg-keys is not connected. This is required for the default gpg crypto backend."
+  echo "To connect, run:"
+  echo "snap connect gopass:gpg-keys"
+  exit 1
+fi
 
 # the home interface does not grant us access to dot-prefixed directories
 # in REALHOME
+REALHOME=`getent passwd $UID | cut -d ':' -f 6`
+password_store="$REALHOME/password-store"
+config_dir="$SNAP_USER_DATA/.config/gopass"
+config_file="$config_dir/config.yml"
 mkdir -p "$PASSWORD_STORE"
-if [ ! -f "$CONFIG_FILE" ]; then
-  mkdir -p "$CONFIG_DIR"
-  printf "%s\n" "root:" "  path: gpgcli-gitcli-fs+file://$PASSWORD_STORE" > "$CONFIG_FILE"
+if [ ! -f "$config_file" ]; then
+  mkdir -p "$config_dir"
+  printf "%s\n" "root:" "  path: gpgcli-gitcli-fs+file://$password_store" > "$config_file"
 fi
 
+# automatically add ssh keys to agent on first unlock
+export GIT_SSH_COMMAND="ssh -o AddKeysToAgent=yes"
 if grep -q sss_ssh_knownhostsproxy /etc/ssh/ssh_config; then
   # ignore global SSH config because SSSD's known hosts config is not supported
   # by the ssh-keys interface
-  export GIT_SSH_COMMAND="ssh -F $REALHOME/.ssh/config"
+  export GIT_SSH_COMMAND="$GIT_SSH_COMMAND -F $HOME/.ssh/config"
 fi
 
-exec "${@}"
+
+# run gopass with fake tty so gpg's pinentry does not fail
+cmd="$1"
+shift
+
+faketty "$cmd" "$@"

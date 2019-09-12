@@ -1,0 +1,13 @@
+#!/bin/bash
+
+REALHOME=`getent passwd $UID | cut -d ':' -f 6`
+host_ssh="$REALHOME/.ssh"
+snap_ssh="$HOME/.ssh"
+
+rm -rf "$snap_ssh"
+
+if [ -d "$host_ssh" ]; then
+  ln -s "$host_ssh" "$snap_ssh"
+fi
+
+exec "${@}"

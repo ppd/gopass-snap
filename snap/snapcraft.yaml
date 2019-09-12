@@ -18,23 +18,20 @@ license: MIT
 plugs:
   home: null
   gpg-keys: null
-  gpg-public-keys: null
+  ssh-keys: null # for git
+  x11: null # for xsel
   network-bind: null
   
 apps:
-  import-gpg-keys:
-    command: import-gpg-keys
   gopass:
     command: bin/gopass
-    command-chain: [wrap-ssh, wrap-gpg, launch-gopass]
-    plugs:
-      - x11 # for xsel
-      - ssh-keys # for git
+    command-chain: [launch-gopass, import-gpg-keys, link-ssh, wrap-gpg, start-ssh-agent]
 
 parts:
   launchers:
     plugin: dump
     source: snap/local
+
   gopass:
     plugin: go
     go-importpath: github.com/gopasspw/gopass
@@ -78,5 +75,4 @@ layout:
     bind: $SNAP/usr/lib/gnupg
   /usr/share/gnupg:
     bind: $SNAP/usr/share/gnupg
-  /usr/bin/ssh-agent:
-    bind-file: $SNAP/usr/bin/ssh-agent
+  

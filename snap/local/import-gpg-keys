@@ -1,32 +1,24 @@
 #!/bin/bash
-set -e
 
-if [ -z "$SNAP_USER_DATA" ]; then
-    echo "SNAP_USER_DATA not set"
-    exit 1
-fi
+REALHOME=$(getent passwd "$UID" | cut -d ':' -f 6)
 
-myid="$(id -u)"
-host_home=$(getent passwd "$myid" | cut -d ':' -f 6)
+host_gpg="$REALHOME/.gnupg"
+snap_gpg="$HOME/.gnupg"
 
-host_gpg="$host_home/.gnupg"
-if [ ! -d "$host_gpg" ]; then
-    echo "'$host_gpg' does not exist"
-    exit 0
-fi
-
-dest="$SNAP_USER_DATA/.gnupg"
-if [ -d "$dest" ]; then
-    rm -rf "$dest"/*
+if [ -d "$snap_gpg" ]; then
+    rm -rf "$snap_gpg"/*
 else
-    mkdir -m 0700 "$dest"
+    mkdir -m 0700 "$snap_gpg"
 fi
 
-cp -r "$host_gpg"/* "$dest"
-rm -f "$dest"/S.*    # remove any sockets
-rm -f "$dest"/*.conf # remove any config files
+if [ -d "$host_gpg" ]; then
+    cp -r "$host_gpg"/* "$snap_gpg"
+fi
 
-cd "$SNAP_USER_DATA/../current"
+rm -f "$snap_gpg"/S.*    # remove any sockets
+rm -f "$snap_gpg"/*.conf # remove any config files
+
+cd "$HOME/../current"
 SNAP_CURRENT="$(pwd)"
 GNUPGHOME="$SNAP_CURRENT/.gnupg"
 
@@ -37,3 +29,5 @@ EOM
 cat > "$GNUPGHOME/gpg.conf" <<EOM
 homedir $GNUPGHOME
 EOM
+
+exec "${@}"
