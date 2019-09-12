@@ -1,34 +1,48 @@
 #!/bin/bash
-set -e
 
-faketty() {
-    script -qfc "$(printf "%q " "$@")" /dev/null
+function faketty() {
+  script -qfc "$(printf "%q " "$@")" /dev/null
 }
 
+function can_open_file() {
+  return $(head -c0 "$1" &> /dev/null);
+}
+
+function file_exists() {
+  return $(stat "$1" &> /dev/null)
+}
+
+realhome=`getent passwd $UID | cut -d ':' -f 6`
+
 # check the required interfaces (ssh-keys, gpg-keys) and tell user how to connect them
-stat /etc/ssh/ssh_config && ssh_keys_connected=true
-stat /usr/bin/gpg && gpg_keys_connected=true
+can_open_file /etc/ssh/ssh_config || ssh_keys_connected=false
 
-if ! $ssh_keys_connected; then
-  echo "Plug ssh-keys is not connected. This is required for syncing with git ssh remotes."
-  echo "To connect, run:"
-  echo "snap connect gopass:ssh-keys"
+gnupg_home="$realhome/.gnupg"
+if file_exists "$gnupg_home" && ! can_open_file "$gnupg_home"; then
+  gpg_keys_connected=false
 fi
 
-if ! $gpg_keys_connected; then
-  echo "Plug gpg-keys is not connected. This is required for the default gpg crypto backend."
-  echo "To connect, run:"
-  echo "snap connect gopass:gpg-keys"
+if [ "$ssh_keys_connected" = false ]; then
+  printf "%s\n" \
+  "Plug ssh-keys is not connected. This is required for syncing with git ssh remotes." \
+  "To connect, run:" \
+  "snap connect gopass:ssh-keys" ""
 fi
 
-if [ ! $ssh_keys_connected ] || [ ! $gpg_keys_connected ]; then
+if [ "$gpg_keys_connected" = false ]; then
+  printf "%s\n" \
+  "Plug gpg-keys is not connected. This is required for the default gpg crypto backend." \
+  "To connect, run:" \
+  "snap connect gopass:gpg-keys" ""
+fi
+
+if [ "$ssh_keys_connected" = false ] || [ "$gpg_keys_connected" = false ]; then
   exit 1
 fi
 
 # the home interface does not grant us access to dot-prefixed directories
 # in REALHOME
 
-realhome=`getent passwd $UID | cut -d ':' -f 6`
 password_store="$realhome/password-store"
 config_dir="$SNAP_USER_DATA/.config/gopass"
 config_file="$config_dir/config.yml"
