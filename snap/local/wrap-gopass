@@ -9,19 +9,19 @@ faketty() {
 stat /etc/ssh/ssh_config && ssh_keys_connected=true
 stat /usr/bin/gpg && gpg_keys_connected=true
 
-if ! ssh_keys_connected; then
+if ! $ssh_keys_connected; then
   echo "Plug ssh-keys is not connected. This is required for syncing with git ssh remotes."
   echo "To connect, run:"
   echo "snap connect gopass:ssh-keys"
 fi
 
-if ! gpg_keys_connected; then
+if ! $gpg_keys_connected; then
   echo "Plug gpg-keys is not connected. This is required for the default gpg crypto backend."
   echo "To connect, run:"
   echo "snap connect gopass:gpg-keys"
 fi
 
-if ! ssh_keys_connected || ! gpg_keys_connected; then
+if [ ! $ssh_keys_connected ] || [ ! $gpg_keys_connected ]; then
   exit 1
 fi
 
