@@ -43,8 +43,10 @@ fi
 # the home interface does not grant us access to dot-prefixed directories
 # in REALHOME
 
-export GOPASS_HOMEDIR="$realhome/gopass"
-mkdir -p "$GOPASS_HOMEDIR"
+if [ ! "$GOPASS_HOMEDIR" ]; then
+  export GOPASS_HOMEDIR="$realhome/gopass"
+  mkdir -p "$GOPASS_HOMEDIR"
+fi
 
 # automatically add ssh keys to agent on first unlock
 export GIT_SSH_COMMAND="ssh -o AddKeysToAgent=yes"
