@@ -20,7 +20,7 @@ plugs:
   ssh-keys: null # for git
   x11: null # for xsel
   network-bind: null
-  
+
 apps:
   gopass:
     command: bin/gopass
@@ -50,6 +50,7 @@ parts:
       - pinentry-curses
       - bsdutils
       - openssh-client
+      - rsync
 
 layout:
   /etc/gnupg:
@@ -74,4 +75,3 @@ layout:
     bind: $SNAP/usr/lib/gnupg
   /usr/share/gnupg:
     bind: $SNAP/usr/share/gnupg
-  

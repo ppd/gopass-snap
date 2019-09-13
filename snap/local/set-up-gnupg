@@ -2,38 +2,34 @@
 set -e
 
 realhome=$(getent passwd "$UID" | cut -d ':' -f 6)
-
 host_gpg="$realhome/.gnupg"
-snap_gpg="$HOME/.gnupg"
 
 cd "$SNAP_USER_DATA/../current"
 snap_current="$(pwd)"
 export GNUPGHOME="$snap_current/.gnupg"
 
-# import gpg keys from host
-
-if [ -d "$snap_gpg" ]; then
-    rm -rf "$snap_gpg"/*
-else
-    mkdir -m 0700 "$snap_gpg"
-fi
-
-if [ -d "$host_gpg" ]; then
-    cp -r "$host_gpg"/* "$snap_gpg"
-fi
-
-rm -f "$snap_gpg"/S.*    # remove any sockets
-rm -f "$snap_gpg"/*.conf # remove any config files
-
 if [ ! -d "$GNUPGHOME" ]; then
     mkdir -m 0700 "$GNUPGHOME"
-    cat > "$GNUPGHOME/gpg-agent.conf" <<EOM
+fi
+
+# import gpg keys from host
+if [ -d "$host_gpg" ]; then
+    rsync -r --delete --exclude "S.*" --exclude "*.conf" "$host_gpg/" "$GNUPGHOME" 
+fi
+
+gpg_agent_conf="$GNUPGHOME/gpg-agent.conf"
+if [ ! -f "$gpg_agent_conf" ]; then
+    cat > "$gpg_agent_conf" <<EOM
 homedir $GNUPGHOME
 EOM
+fi
 
+gpg_conf="$GNUPGHOME/gpg.conf"
+if [ ! -f "$gpg_conf" ]; then
     cat > "$GNUPGHOME/gpg.conf" <<EOM
 homedir $GNUPGHOME
 EOM
 fi
 
+# start 
 exec "${@}"
