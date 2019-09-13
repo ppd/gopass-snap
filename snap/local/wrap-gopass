@@ -43,14 +43,8 @@ fi
 # the home interface does not grant us access to dot-prefixed directories
 # in REALHOME
 
-password_store="$realhome/password-store"
-config_dir="$SNAP_USER_DATA/.config/gopass"
-config_file="$config_dir/config.yml"
-mkdir -p "$password_store"
-if [ ! -f "$config_file" ]; then
-  mkdir -p "$config_dir"
-  printf "%s\n" "root:" "  path: gpgcli-gitcli-fs+file://$password_store" > "$config_file"
-fi
+export GOPASS_HOMEDIR="$realhome/gopass"
+mkdir -p "$GOPASS_HOMEDIR"
 
 # automatically add ssh keys to agent on first unlock
 export GIT_SSH_COMMAND="ssh -o AddKeysToAgent=yes"
@@ -59,7 +53,6 @@ if grep -q sss_ssh_knownhostsproxy /etc/ssh/ssh_config; then
   # by the ssh-keys interface
   export GIT_SSH_COMMAND="$GIT_SSH_COMMAND -F $HOME/.ssh/config"
 fi
-
 
 # run gopass with fake tty so gpg's pinentry does not fail
 cmd="$1"
