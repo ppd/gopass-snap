@@ -18,13 +18,32 @@ plugs:
   home: null
   gpg-keys: null
   ssh-keys: null # for git
-  x11: null # for xsel
   network-bind: null
+  x11: null
+  desktop: null
+  desktop-legacy: null
+  wayland: null
+  gsettings: null
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
 
 apps:
   gopass:
+    environment:
+      QT_QPA_PLATFORMTHEME: gtk3
+    adapter: full
     command: bin/gopass
-    command-chain: [wrap-gopass, set-up-gnupg, set-up-ssh]
+    command-chain: [bin/desktop-launch, wrap-gopass, set-up-gnupg, set-up-ssh]
 
 parts:
   launchers:
@@ -48,9 +67,37 @@ parts:
       - gpgsm
       - gpgv
       - pinentry-curses
+      - pinentry-qt
       - bsdutils
       - openssh-client
       - rsync
+    
+  qt5:
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    plugin: make
+    make-parameters: ["FLAVOR=qt5"]
+    build-packages:
+      - qtbase5-dev
+      - dpkg-dev
+    stage-packages:
+      - libxkbcommon0
+      - ttf-ubuntu-font-family
+      - dmz-cursor-theme
+      - light-themes
+      - adwaita-icon-theme
+      - gnome-themes-standard
+      - shared-mime-info
+      - libqt5gui5
+      - libgdk-pixbuf2.0-0
+      - libqt5svg5 # for loading icon themes which are svg
+      - try: [appmenu-qt5] # not available on core18
+      - locales-all
+    
+  qt5-gtk-platform:
+    plugin: nil
+    stage-packages:
+      - qt5-gtk-platformtheme
 
 layout:
   /etc/gnupg:
@@ -70,7 +117,7 @@ layout:
   /usr/bin/gpgv:
     bind-file: $SNAP/usr/bin/gpgv
   /usr/bin/pinentry:
-    bind-file: $SNAP/usr/bin/pinentry-curses
+    symlink: $SNAP/pinentry
   /usr/lib/gnupg:
     bind: $SNAP/usr/lib/gnupg
   /usr/share/gnupg:

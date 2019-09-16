@@ -1,0 +1,4 @@
+#!/bin/bash
+
+. $HOME/.gopass-env
+$SNAP/usr/bin/pinentry-qt
