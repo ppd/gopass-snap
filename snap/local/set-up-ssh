@@ -1,5 +1,4 @@
-#!/bin/bash
-set -e
+#!/bin/bash -e
 
 realhome=`getent passwd $UID | cut -d ':' -f 6`
 

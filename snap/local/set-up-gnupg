@@ -1,5 +1,8 @@
-#!/bin/bash
-set -e
+#!/bin/bash -e
+
+function faketty() {
+  script -qfc "export GPG_TTY=\$(tty); $(printf "%q " "$@")" /dev/null
+}
 
 realhome=$(getent passwd "$UID" | cut -d ':' -f 6)
 host_gpg="$realhome/.gnupg"
@@ -31,5 +34,8 @@ homedir $GNUPGHOME
 EOM
 fi
 
-# start 
-exec "${@}"
+# run gpg with fake tty so pinentry-curses does not fail
+cmd="$1"
+shift
+
+faketty "$cmd" "$@"

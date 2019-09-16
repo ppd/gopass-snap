@@ -1,9 +1,5 @@
 #!/bin/bash
 
-function faketty() {
-  script -qfc "$(printf "%q " "$@")" /dev/null
-}
-
 function can_open_file() {
   return $(head -c0 "$1" &> /dev/null);
 }
@@ -56,8 +52,6 @@ if grep -q sss_ssh_knownhostsproxy /etc/ssh/ssh_config; then
   export GIT_SSH_COMMAND="$GIT_SSH_COMMAND -F $HOME/.ssh/config"
 fi
 
-# run gopass with fake tty so gpg's pinentry does not fail
-cmd="$1"
-shift
+export -p > $HOME/.gopass-env
 
-faketty "$cmd" "$@"
+exec "${@}"
