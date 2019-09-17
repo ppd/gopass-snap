@@ -41,6 +41,7 @@ apps:
   gopass:
     environment:
       QT_QPA_PLATFORMTHEME: gtk3
+      DISABLE_WAYLAND: 1
     adapter: full
     command: bin/gopass
     command-chain: [bin/desktop-launch, wrap-gopass, set-up-gnupg, set-up-ssh]
@@ -93,6 +94,7 @@ parts:
       - libqt5svg5 # for loading icon themes which are svg
       - try: [appmenu-qt5] # not available on core18
       - locales-all
+      - qtwayland5
     
   qt5-gtk-platform:
     plugin: nil
