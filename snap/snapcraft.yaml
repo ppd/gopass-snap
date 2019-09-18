@@ -37,14 +37,23 @@ plugs:
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
 
+environment:
+  QT_QPA_PLATFORMTHEME: gtk3
+  DISABLE_WAYLAND: 1
+
 apps:
   gopass:
-    environment:
-      QT_QPA_PLATFORMTHEME: gtk3
-      DISABLE_WAYLAND: 1
     adapter: full
     command: bin/gopass
-    command-chain: [bin/desktop-launch, wrap-gopass, set-up-gnupg, set-up-ssh]
+    command-chain: &wrappers [bin/desktop-launch, wrap-gopass, set-up-gnupg, set-up-ssh]
+  jsonapi:
+    adapter: full
+    command: bin/gopass jsonapi listen
+    command-chain: *wrappers
+  firefox-manifest:
+    command: cat $SNAP/manifests/firefox-gopassbridge.json
+  chrome-manifest:
+    command: cat $SNAP/manifests/chrome-gopassbridge.json
 
 parts:
   launchers:
