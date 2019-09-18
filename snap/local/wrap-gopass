@@ -52,6 +52,4 @@ if grep -q sss_ssh_knownhostsproxy /etc/ssh/ssh_config; then
   export GIT_SSH_COMMAND="$GIT_SSH_COMMAND -F $HOME/.ssh/config"
 fi
 
-export -p > $HOME/.gopass-env
-
 exec "${@}"
