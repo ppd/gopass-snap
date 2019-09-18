@@ -56,10 +56,20 @@ apps:
     command: cat $SNAP/manifests/chrome-gopassbridge.json
 
 parts:
-  launchers:
+  manifests:
     plugin: dump
-    source: snap/local
-
+    source: snap/local/manifests
+    organize:
+      '*': manifests/
+  
+  wrappers:
+    plugin: dump
+    source: snap/local/wrappers
+  
+  pinentry:
+    plugin: dump
+    source: snap/local/pinentry
+    
   gopass:
     plugin: go
     go-importpath: github.com/gopasspw/gopass
