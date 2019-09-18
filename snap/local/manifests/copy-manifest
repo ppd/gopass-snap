@@ -1,0 +1,19 @@
+#!/bin/bash
+
+realhome=`getent passwd $UID | cut -d ':' -f 6`
+browser="$1"
+
+case "$browser" in
+  "chrome")
+    folder="$realhome/.config/google-chrome/NativeMessagingHosts"
+    ;;
+  "firefox")
+    folder="$realhome/.mozilla/native-messaging-hosts"
+    ;;
+  *)
+    echo "Unknown browser"
+    exit 1
+esac
+
+
+$SNAP/bin/xdg-desktop-portal-copy-file 

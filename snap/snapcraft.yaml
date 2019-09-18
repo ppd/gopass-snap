@@ -50,12 +50,19 @@ apps:
     adapter: full
     command: bin/gopass jsonapi listen
     command-chain: *wrappers
-  firefox-manifest:
-    command: cat $SNAP/manifests/firefox-gopassbridge.json
-  chrome-manifest:
-    command: cat $SNAP/manifests/chrome-gopassbridge.json
+  configure-firefox:
+    command: xdg-desktop-portal-copy-file $SNAP/manifests/firefox-gopassbridge.json ~/
+  configure-chrome:
+    command: xdg-desktop-portal-copy-file $SNAP/manifests/chrome-gopassbridge.json
 
 parts:
+  qarma:
+    plugin: nil
+    stage-snaps: 
+      - qarma/18
+    stage:
+      - usr/bin/qarma
+    
   manifests:
     plugin: dump
     source: snap/local/manifests
@@ -69,6 +76,11 @@ parts:
   pinentry:
     plugin: dump
     source: snap/local/pinentry
+
+  xdg-desktop-portal-copy-file:
+    plugin: go
+    go-importpath: github.com/ppd1990/xdg-desktop-portal-copy-file
+    source: https://github.com/ppd1990/xdg-desktop-portal-copy-file.git
     
   gopass:
     plugin: go
