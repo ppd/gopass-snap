@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-realhome=`getent passwd $UID | cut -d ':' -f 6`
+realhome=$(getent passwd $UID | cut -d ':' -f 6)
 
 # link host's ssh config if it exists
 
@@ -10,7 +10,12 @@ snap_ssh="$HOME/.ssh"
 rm -rf "$snap_ssh"
 
 if [ -d "$host_ssh" ]; then
-  ln -s "$host_ssh" "$snap_ssh"
+  mkdir -m 0700 "$snap_ssh"
+fi
+
+# import ssh keys from host
+if [ -d "$host_ssh" ]; then
+  rsync -r --delete "$host_ssh/" "$snap_ssh"
 fi
 
 # start ssh agent if it is not already running
