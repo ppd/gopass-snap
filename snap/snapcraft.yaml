@@ -40,7 +40,6 @@ plugs:
 environment:
   QT_QPA_PLATFORMTHEME: gtk3
   DISABLE_WAYLAND: 1
-  SSH_ASKPASS: $SNAP/usr/lib/openssh/gnome-ssh-askpass
 
 apps:
   gopass:
@@ -51,6 +50,8 @@ apps:
     adapter: full
     command: bin/gopass jsonapi listen
     command-chain: *wrappers
+    environment:
+      GRAPHICAL_SSH_ASKPASS: 1
   firefox-manifest:
     command: cat $SNAP/manifests/firefox-gopassbridge.json
   chrome-manifest:
@@ -70,9 +71,12 @@ parts:
   ssh:
     plugin: dump
     source: snap/local/ssh
+    organize: 
+      ssh: ssh-bin/
     stage-packages: 
       - openssh-client
       - ssh-askpass-gnome
+      - util-linux
 
   gnupg:
     plugin: dump
