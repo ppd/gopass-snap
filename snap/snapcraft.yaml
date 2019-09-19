@@ -40,6 +40,7 @@ plugs:
 environment:
   QT_QPA_PLATFORMTHEME: gtk3
   DISABLE_WAYLAND: 1
+  SSH_ASKPASS: $SNAP/usr/lib/openssh/gnome-ssh-askpass
 
 apps:
   gopass:
@@ -65,10 +66,25 @@ parts:
   wrappers:
     plugin: dump
     source: snap/local/wrappers
-  
-  pinentry:
+
+  ssh:
     plugin: dump
-    source: snap/local/pinentry
+    source: snap/local/ssh
+    stage-packages: 
+      - openssh-client
+      - ssh-askpass-gnome
+
+  gnupg:
+    plugin: dump
+    source: snap/local/gnupg
+    stage-packages: 
+      - gpg
+      - gpg-agent
+      - gpgconf
+      - gpgsm
+      - gpgv
+      - pinentry-curses
+      - pinentry-qt
     
   gopass:
     plugin: go
@@ -81,15 +97,7 @@ parts:
       - git
       - rng-tools
       - xsel
-      - gpg
-      - gpg-agent
-      - gpgconf
-      - gpgsm
-      - gpgv
-      - pinentry-curses
-      - pinentry-qt
       - bsdutils
-      - openssh-client
       - rsync
     
   qt5:
@@ -143,3 +151,5 @@ layout:
     bind: $SNAP/usr/lib/gnupg
   /usr/share/gnupg:
     bind: $SNAP/usr/share/gnupg
+  /usr/share/pixmaps:
+    bind: $SNAP/usr/share/pixmaps
