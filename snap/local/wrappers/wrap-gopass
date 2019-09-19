@@ -45,7 +45,8 @@ if [ ! "$GOPASS_HOMEDIR" ]; then
 fi
 
 # automatically add ssh keys to agent on first unlock
-export GIT_SSH_COMMAND="ssh -o AddKeysToAgent=yes"
+# UserKnownHostsFile must be set because ssh ignores $HOME and tries to write to $realhome/.ssh/known_hosts
+export GIT_SSH_COMMAND="ssh -o AddKeysToAgent=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
 if grep -q sss_ssh_knownhostsproxy /etc/ssh/ssh_config; then
   # ignore global SSH config because SSSD's known hosts config is not supported
   # by the ssh-keys interface
