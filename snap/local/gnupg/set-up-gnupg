@@ -30,7 +30,6 @@ homedir $GNUPGHOME
 EOM
 fi
 
-# save env in which gpg is called so the pinentry can pick it up
 export -p > $HOME/.gpg-env
 
 exec "${@}"

@@ -39,7 +39,7 @@ fi
 # the home interface does not grant us access to dot-prefixed directories
 # in REALHOME
 
-if [ ! "$GOPASS_HOMEDIR" ]; then
+if [ -z "$GOPASS_HOMEDIR" ]; then
   export GOPASS_HOMEDIR="$realhome/gopass"
   mkdir -p "$GOPASS_HOMEDIR"
 fi

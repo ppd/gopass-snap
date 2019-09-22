@@ -27,27 +27,3 @@ snap connect gopass:ssh-keys
 
 Atm, the default store and config location is not `$HOME`, but `$HOME/gopass`.
 
-## Native Messaging Manifests for Browsers
-
-Do not use `gopass jsonapi configure` to install the manifests, it is not suitable for the snap package.
-
-### Firefox
-
-```bash
-mkdir -p ~/.mozilla/native-messaging-hosts
-gopass.firefox-manifest | tee > ~/.mozilla/native-messaging-hosts/com.justwatch.gopass.json
-```
-
-### Chrome
-
-```bash
-mkdir -p ~/.config/google-chrome/NativeMessagingHosts
-gopass.chrome-manifest | tee > ~/.config/google-chrome/NativeMessagingHosts/com.justwatch.gopass.json
-```
-
-### Chromium
-
-```bash
-mkdir -p ~/.config/chromium/NativeMessagingHosts
-gopass.chrome-manifest | tee > ~/.config/chromium/NativeMessagingHosts/com.justwatch.gopass.json
-```

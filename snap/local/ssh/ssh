@@ -1,9 +1,5 @@
 #!/bin/bash
 
-function faketty() {
-  script -qfc "$(printf "%q " "$@")" /dev/null
-}
-
 # automatically add ssh keys to agent on first unlock
 # UserKnownHostsFile must be set because ssh ignores $HOME and tries to write to $realhome/.ssh/known_hosts
 ssh_options="-o AddKeysToAgent=yes -o UserKnownHostsFile=$HOME/.ssh/known_hosts"
@@ -16,8 +12,8 @@ fi
 
 ssh_command="$SNAP/usr/bin/ssh $ssh_options $@"
 
-if [ -n "$GRAPHICAL_SSH_ASKPASS" ]; then
-  SSH_ASKPASS="$SNAP/usr/lib/openssh/gnome-ssh-askpass" setsid $ssh_command
-else
-  $ssh_command
+if [ -n "$SSH_ASKPASS" ]; then
+  ssh_command="setsid $ssh_command"
 fi
+
+exec "$ssh_command"

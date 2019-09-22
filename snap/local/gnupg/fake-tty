@@ -1,0 +1,11 @@
+#!/bin/bash
+
+function faketty() {
+  script -qfc "$(printf "%q " "$@")" /dev/null
+}
+
+if [ -n "$FAKE_TTY" ]; then
+  faketty "${@}"
+else
+  exec "${@}"
+fi

@@ -20,50 +20,20 @@ plugs:
   ssh-keys: null # for git
   network-bind: null
   x11: null
-  desktop: null
-  desktop-legacy: null
-  wayland: null
-  gsettings: null
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
-
-environment:
-  QT_QPA_PLATFORMTHEME: gtk3
-  DISABLE_WAYLAND: 1
 
 apps:
   gopass:
     adapter: full
     command: bin/gopass
-    command-chain: &wrappers [bin/desktop-launch, wrap-gopass, set-up-gnupg, set-up-ssh]
-  jsonapi:
-    adapter: full
-    command: bin/gopass jsonapi listen
-    command-chain: *wrappers
+    command-chain: 
+      - wrap-gopass
+      - set-up-gnupg
+      - set-up-ssh
+      - fake-tty
     environment:
-      GRAPHICAL_SSH_ASKPASS: 1
-  firefox-manifest:
-    command: cat $SNAP/manifests/firefox-gopassbridge.json
-  chrome-manifest:
-    command: cat $SNAP/manifests/chrome-gopassbridge.json
+      FAKE_TTY: 1
 
-parts:    
-  manifests:
-    plugin: dump
-    source: snap/local/manifests
-    organize:
-      '*': manifests/
-  
+parts:      
   wrappers:
     plugin: dump
     source: snap/local/wrappers
@@ -75,8 +45,8 @@ parts:
       ssh: ssh-bin/
     stage-packages: 
       - openssh-client
-      - ssh-askpass-gnome
       - util-linux
+      - rsync
 
   gnupg:
     plugin: dump
@@ -85,72 +55,37 @@ parts:
       - gpg
       - gpg-agent
       - gpgconf
-      - gpgsm
-      - gpgv
       - pinentry-curses
-      - pinentry-qt
-    
+      - rsync
+
   gopass:
     plugin: go
     go-importpath: github.com/gopasspw/gopass
     source: https://github.com/gopasspw/gopass.git
     source-tag: "v1.8.6"
-    build-packages:
+    build-packages: 
       - gcc
     stage-packages:
       - git
       - rng-tools
       - xsel
       - bsdutils
-      - rsync
-    
-  qt5:
-    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
-    source-subdir: qt
-    plugin: make
-    make-parameters: ["FLAVOR=qt5"]
-    build-packages:
-      - qtbase5-dev
-      - dpkg-dev
-    stage-packages:
-      - libxkbcommon0
-      - ttf-ubuntu-font-family
-      - dmz-cursor-theme
-      - light-themes
-      - adwaita-icon-theme
-      - gnome-themes-standard
-      - shared-mime-info
-      - libqt5gui5
-      - libgdk-pixbuf2.0-0
-      - libqt5svg5 # for loading icon themes which are svg
-      - try: [appmenu-qt5] # not available on core18
-      - locales-all
-      - qtwayland5
-    
-  qt5-gtk-platform:
-    plugin: nil
-    stage-packages:
-      - qt5-gtk-platformtheme
-
+  
 layout:
   /etc/gnupg:
     bind: $SNAP/etc/gnupg
   /usr/bin/dirmngr:
     bind-file: $SNAP/usr/bin/dirmngr
   /usr/bin/gpg:
-    bind-file: $SNAP/usr/bin/gpg
+    bind-file: $SNAP/gpg
   /usr/bin/gpg-agent:
     bind-file: $SNAP/usr/bin/gpg-agent
   /usr/bin/gpg-connect-agent:
     bind-file: $SNAP/usr/bin/gpg-connect-agent
   /usr/bin/gpgconf:
     bind-file: $SNAP/usr/bin/gpgconf
-  /usr/bin/gpgsm:
-    bind-file: $SNAP/usr/bin/gpgsm
-  /usr/bin/gpgv:
-    bind-file: $SNAP/usr/bin/gpgv
   /usr/bin/pinentry:
-    symlink: $SNAP/pinentry
+    bind-file: $SNAP/usr/bin/pinentry-curses
   /usr/lib/gnupg:
     bind: $SNAP/usr/lib/gnupg
   /usr/share/gnupg:
