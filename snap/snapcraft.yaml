@@ -26,6 +26,7 @@ apps:
     adapter: full
     command: bin/gopass
     command-chain: 
+      - bin/locales-launch
       - wrap-gopass
       - set-up-gnupg
       - set-up-ssh
