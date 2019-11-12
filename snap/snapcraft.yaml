@@ -33,6 +33,7 @@ apps:
       - fake-tty
     environment:
       FAKE_TTY: 1
+      EDITOR: $SNAP/bin/nano
 
 parts:      
   wrappers:
@@ -79,6 +80,7 @@ parts:
       - rng-tools
       - xsel
       - bsdutils
+      - nano
   
 layout:
   /etc/gnupg:
@@ -99,5 +101,7 @@ layout:
     bind: $SNAP/usr/lib/gnupg
   /usr/share/gnupg:
     bind: $SNAP/usr/share/gnupg
-  /usr/share/pixmaps:
-    bind: $SNAP/usr/share/pixmaps
+  /etc/nanorc:
+    bind-file: $SNAP/etc/nanorc
+  /usr/share/nano:
+    bind: $SNAP/usr/share/nano
