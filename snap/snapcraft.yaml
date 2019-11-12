@@ -58,6 +58,14 @@ parts:
       - pinentry-curses
       - rsync
 
+  locales-launch:
+    plugin: nil
+    stage-snaps: 
+      - locales-launch
+    stage-packages: 
+      - libc-bin
+      - locales
+
   gopass:
     plugin: go
     go-importpath: github.com/gopasspw/gopass
