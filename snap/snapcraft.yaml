@@ -1,6 +1,6 @@
 name: gopass
 base: core18
-version: "1.8.6"
+adopt-info: gopass
 summary: The slightly more awesome Standard Unix Password Manager for Teams
 description: | 
   gopass is a rewrite of the pass password manager in Go with the aim of making it 
@@ -25,7 +25,7 @@ apps:
   gopass:
     adapter: full
     command: bin/gopass
-    command-chain: 
+    command-chain:
       - bin/locales-launch
       - wrap-gopass
       - set-up-gnupg
@@ -72,7 +72,13 @@ parts:
     plugin: go
     go-importpath: github.com/gopasspw/gopass
     source: https://github.com/gopasspw/gopass.git
-    source-tag: "v1.8.6"
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version "$(git describe --dirty)"
+    override-build: |
+      go build -ldflags "-X github.com/gopasspw/gopass/pkg/tempfile.globalPrefix=snap.gopass." -o gopass
+      mkdir -p "$SNAPCRAFT_PART_INSTALL/bin"
+      cp gopass "$SNAPCRAFT_PART_INSTALL/bin"
     build-packages: 
       - gcc
     stage-packages:
